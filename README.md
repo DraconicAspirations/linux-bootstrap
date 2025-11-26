@@ -1,5 +1,8 @@
 Run this: 
 
 ```sh
-pacman -Syu && pacman -S git && git clone https://github.com/DraconicAspirations/linux-bootstrap.git
+pacman -Syu --noconfirm && \
+pacman -S --noconfirm git base-devel && \
+git clone https://github.com/DraconicAspirations/linux-bootstrap.git && \
+bash linux-bootstrap/setup.sh
 ```
