@@ -31,7 +31,7 @@ bash "$SCRIPT_DIR/github-connect.sh"
 echo ""
 echo "⏸️  Please add your SSH public key to GitHub if you haven't already."
 echo "   https://github.com/settings/keys"
-read -p "Press Enter once the key is added to continue…"
+read -p "Press Enter once the key is added to continue…" < /dev/tty
 
 echo ""
 echo "📥 Step 2: Sync dotfiles from linux-sync repo"
