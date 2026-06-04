@@ -19,7 +19,7 @@ fi
 # 1. Get script directory
 # ───────────────────────────────────────────────
 
-SCRIPT_DIR="$(cd ""+"(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # ───────────────────────────────────────────────
 # 2. Run the three setup scripts in order
