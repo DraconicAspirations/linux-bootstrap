@@ -6,14 +6,15 @@ SYNC_DIR="$HOME/linux-sync"
 
 sudo pacman -S --needed git rsync openssh
 
-# --- Clone repo ---
-echo "Cloning repo: $REPO_SSH"
-if [[ -d "$SYNC_DIR" ]]; then
-  echo "Existing linux-sync folder found. Removing old version…"
-  rm -rf "$SYNC_DIR"
+# --- Clone or update repo ---
+if [[ -d "$SYNC_DIR/.git" ]]; then
+  echo "Existing linux-sync repo found. Pulling latest…"
+  git -C "$SYNC_DIR" pull
+else
+  echo "Cloning repo: $REPO_SSH"
+  [[ -d "$SYNC_DIR" ]] && rm -rf "$SYNC_DIR"
+  git clone "$REPO_SSH" "$SYNC_DIR"
 fi
-
-git clone "$REPO_SSH" "$SYNC_DIR"
 
 # --- Sync files into home ---
 echo "Syncing files into home directory…"
@@ -25,6 +26,13 @@ echo "Syncing files into home directory…"
 # --exclude = skip .git and sensitive directories
 rsync -av \
   --exclude=".ssh/" \
-  "$SYNC_DIR/" "$HOME/"
+  "$SYNC_DIR/" "$HOME/" || {
+    code=$?
+    # Exit code 24 = vanished source files (transient git lock files). Safe to ignore.
+    if [[ $code -ne 24 ]]; then
+      echo "❌ rsync failed with exit code $code"
+      exit $code
+    fi
+  }
 
 echo "✔ Sync complete!"

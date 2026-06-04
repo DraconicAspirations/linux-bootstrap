@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PKGFILE="$HOME/linux-sync/pkglist.txt"
+PKGFILE="$HOME/linux-sync/.config/packages/pkglist.txt"
 
 # --- Validate pkglist.txt ---
 if [[ ! -f "$PKGFILE" ]]; then
@@ -50,8 +50,8 @@ echo ""
 echo "🐚 Installing and switching to zsh…"
 sudo pacman -S --needed --noconfirm zsh
 
-if chsh -s /usr/bin/zsh root 2>/dev/null; then
-    echo "✔ Default shell changed to zsh system-wide."
+if sudo chsh -s /usr/bin/zsh "$USER"; then
+    echo "✔ Default shell changed to zsh for user $USER."
 else
     echo "⚠ chsh failed (WSL limitation). Falling back to user-level override."
 
@@ -63,4 +63,4 @@ else
 fi
 
 echo ""
-echo "🎉 Done! Restart your terminal."
+echo "🎉 Done! Shell setup complete."

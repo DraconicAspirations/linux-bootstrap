@@ -29,6 +29,11 @@ echo "🔑 Step 1: GitHub SSH Setup"
 bash "$SCRIPT_DIR/github-connect.sh"
 
 echo ""
+echo "⏸️  Please add your SSH public key to GitHub if you haven't already."
+echo "   https://github.com/settings/keys"
+read -p "Press Enter once the key is added to continue…"
+
+echo ""
 echo "📥 Step 2: Sync dotfiles from linux-sync repo"
 bash "$SCRIPT_DIR/sync-home.sh"
 
@@ -38,4 +43,7 @@ bash "$SCRIPT_DIR/setup-home.sh"
 
 echo ""
 echo "=== Bootstrap Complete! ==="
-echo "Restart your terminal.",
+echo ""
+echo "⚠️  IMPORTANT: You must reboot for all changes to take effect."
+echo "   Run: sudo reboot"
+echo ""
