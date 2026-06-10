@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/pkg.sh"
+
 PKGFILE="$HOME/linux-sync/.config/packages/pkglist.txt"
 
 # --- Validate pkglist.txt ---
@@ -11,7 +14,7 @@ fi
 
 # --- Install packages ---
 echo "📦 Installing packages from $PKGFILE…"
-sudo pacman -Syu --needed --noconfirm
+pkg_update
 
 FAILED_PACKAGES=()
 
@@ -21,7 +24,7 @@ set +e
 
 for pkg in $(grep -vE '^\s*$|^\s*#' "$PKGFILE"); do
     echo "→ Installing: $pkg"
-    sudo pacman -S --needed --noconfirm "$pkg"
+    pkg_install "$pkg"
     if [[ $? -ne 0 ]]; then
         echo "  ⚠ Failed: $pkg"
         FAILED_PACKAGES+=("$pkg")
@@ -48,9 +51,10 @@ echo ""
 
 # --- Install zsh and set as default ---
 echo "🐚 Installing and switching to zsh…"
-sudo pacman -S --needed --noconfirm zsh
+pkg_install zsh
 
-if sudo chsh -s /usr/bin/zsh "$USER"; then
+ZSH_PATH="$(command -v zsh)"
+if sudo chsh -s "$ZSH_PATH" "$USER"; then
     echo "✔ Default shell changed to zsh for user $USER."
 else
     echo "⚠ chsh failed (WSL limitation). Falling back to user-level override."

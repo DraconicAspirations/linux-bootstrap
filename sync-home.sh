@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/pkg.sh"
+
 REPO_SSH="git@github.com:DraconicAspirations/linux-sync.git"
 SYNC_DIR="$HOME/linux-sync"
 
-sudo pacman -S --needed git rsync openssh
+pkg_install git rsync openssh
 
 # --- Clone or update repo ---
 if [[ -d "$SYNC_DIR/.git" ]]; then

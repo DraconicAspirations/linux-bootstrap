@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
-sudo pacman -S --needed openssh
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/pkg.sh"
+
+pkg_install openssh
 
 read -p "Enter a name for the SSH key (default: id_ed25519): " KEYNAME
 KEYNAME=${KEYNAME:-id_ed25519}
