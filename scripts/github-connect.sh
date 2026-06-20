@@ -47,10 +47,54 @@ eval "$(ssh-agent -s)"
 ssh-add "$KEY"
 
 echo ""
-echo "Copy this public key to GitHub:"
+echo "To save this key in Github:"
+echo ""
+echo "1. Go to https://github.com/settings/ssh/new"
+echo "2. Give it a name (suggested: $(build_ssh_name))"
+echo "3. Verify with ssh -T git@github.com"
+echo ""
 echo "--------------------------------"
 cat "$KEY.pub"
 echo "--------------------------------"
 
-echo "Then verify with:"
-echo "  ssh -T git@github.com"
+build_ssh_name() {
+    local user
+    local host
+    local public_ip
+    local unique_id
+
+    user="$(whoami)"
+
+    if command -v hostname >/dev/null 2>&1; then
+        host="$(hostname)"
+    elif command -v hostnamectl >/dev/null 2>&1; then
+        host="$(hostnamectl --static 2>/dev/null || true)"
+    elif [[ -r /etc/hostname ]]; then
+        host="$(cat /etc/hostname)"
+    else
+        host="unknown-host"
+    fi
+
+    if command -v curl >/dev/null 2>&1; then
+        public_ip="$(curl -fsSL --max-time 5 https://api.ipify.org 2>/dev/null || true)"
+    elif command -v wget >/dev/null 2>&1; then
+        public_ip="$(wget -qO- --timeout=5 https://api.ipify.org 2>/dev/null || true)"
+    else
+        public_ip=""
+    fi
+
+    if [[ -z "$public_ip" ]]; then
+        public_ip="unknown-ip"
+    fi
+
+    unique_id="$(
+        {
+            printf '%s\n' "$user"
+            printf '%s\n' "$host"
+            [[ -r /etc/machine-id ]] && cat /etc/machine-id
+            [[ -r /var/lib/dbus/machine-id ]] && cat /var/lib/dbus/machine-id
+        } | sha1sum | awk '{print substr($1, 1, 8)}'
+    )"
+
+    echo "${user}@${host} (${public_ip}) (${unique_id})"
+}
