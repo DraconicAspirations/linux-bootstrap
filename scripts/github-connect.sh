@@ -57,6 +57,8 @@ echo "--------------------------------"
 cat "$KEY.pub"
 echo "--------------------------------"
 
+read -r -p "Press Enter once the key is added to continue… " < /dev/tty
+
 build_ssh_name() {
     local user
     local host
