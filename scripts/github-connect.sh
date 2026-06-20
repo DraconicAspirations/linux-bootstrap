@@ -4,6 +4,48 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/pkg.sh"
 
+build_ssh_name() {
+    local user
+    local host
+    local public_ip
+    local unique_id
+
+    user="$(whoami)"
+
+    if command -v hostname >/dev/null 2>&1; then
+        host="$(hostname)"
+    elif command -v hostnamectl >/dev/null 2>&1; then
+        host="$(hostnamectl --static 2>/dev/null || true)"
+    elif [[ -r /etc/hostname ]]; then
+        host="$(cat /etc/hostname)"
+    else
+        host="unknown-host"
+    fi
+
+    if command -v curl >/dev/null 2>&1; then
+        public_ip="$(curl -fsSL --max-time 5 https://api.ipify.org 2>/dev/null || true)"
+    elif command -v wget >/dev/null 2>&1; then
+        public_ip="$(wget -qO- --timeout=5 https://api.ipify.org 2>/dev/null || true)"
+    else
+        public_ip=""
+    fi
+
+    if [[ -z "$public_ip" ]]; then
+        public_ip="unknown-ip"
+    fi
+
+    unique_id="$(
+        {
+            printf '%s\n' "$user"
+            printf '%s\n' "$host"
+            [[ -r /etc/machine-id ]] && cat /etc/machine-id
+            [[ -r /var/lib/dbus/machine-id ]] && cat /var/lib/dbus/machine-id
+        } | sha1sum | awk '{print substr($1, 1, 8)}'
+    )"
+
+    echo "${user}@${host} (${public_ip}) (${unique_id})"
+}
+
 pkg_install openssh
 
 read -p "Enter a name for the SSH key (default: id_ed25519): " KEYNAME
@@ -59,44 +101,3 @@ echo "--------------------------------"
 
 read -r -p "Press Enter once the key is added to continue… " < /dev/tty
 
-build_ssh_name() {
-    local user
-    local host
-    local public_ip
-    local unique_id
-
-    user="$(whoami)"
-
-    if command -v hostname >/dev/null 2>&1; then
-        host="$(hostname)"
-    elif command -v hostnamectl >/dev/null 2>&1; then
-        host="$(hostnamectl --static 2>/dev/null || true)"
-    elif [[ -r /etc/hostname ]]; then
-        host="$(cat /etc/hostname)"
-    else
-        host="unknown-host"
-    fi
-
-    if command -v curl >/dev/null 2>&1; then
-        public_ip="$(curl -fsSL --max-time 5 https://api.ipify.org 2>/dev/null || true)"
-    elif command -v wget >/dev/null 2>&1; then
-        public_ip="$(wget -qO- --timeout=5 https://api.ipify.org 2>/dev/null || true)"
-    else
-        public_ip=""
-    fi
-
-    if [[ -z "$public_ip" ]]; then
-        public_ip="unknown-ip"
-    fi
-
-    unique_id="$(
-        {
-            printf '%s\n' "$user"
-            printf '%s\n' "$host"
-            [[ -r /etc/machine-id ]] && cat /etc/machine-id
-            [[ -r /var/lib/dbus/machine-id ]] && cat /var/lib/dbus/machine-id
-        } | sha1sum | awk '{print substr($1, 1, 8)}'
-    )"
-
-    echo "${user}@${host} (${public_ip}) (${unique_id})"
-}
