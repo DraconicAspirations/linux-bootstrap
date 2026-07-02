@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-#!/usr/bin/env bash
-set -euo pipefail
-
 SELF_SETUP="$HOME/linux-sync/self-setup.sh"
 
 if [[ ! -f "$SELF_SETUP" ]]; then

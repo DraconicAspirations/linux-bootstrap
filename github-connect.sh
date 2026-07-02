@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/lib/pkg.sh"
+source ./pkg.sh
 
 build_ssh_name() {
     local user
@@ -52,15 +51,14 @@ read -p "Enter a name for the SSH key (default: id_ed25519): " KEYNAME
 KEYNAME=${KEYNAME:-id_ed25519}
 KEY="$HOME/.ssh/$KEYNAME"
 
-# Check if SSH key already exists
 if [[ -f "$KEY" ]]; then
     echo "⚠️  SSH key already exists at: $KEY"
     read -p "Do you want to recreate it? This will overwrite the existing key. [y/N]: " -n 1 -r
     echo
+
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         echo "✅ Skipping SSH key creation. Using existing key."
-        
-        # Still show the public key in case they need it
+
         if [[ -f "$KEY.pub" ]]; then
             echo ""
             echo "Your existing public key:"
@@ -68,20 +66,21 @@ if [[ -f "$KEY" ]]; then
             cat "$KEY.pub"
             echo "--------------------------------"
         fi
-        
-        # Try to add to ssh-agent if not already added
+
         eval "$(ssh-agent -s)" 2>/dev/null || true
         ssh-add "$KEY" 2>/dev/null || echo "Key may already be in ssh-agent"
-        
+
         echo ""
         echo "You can verify your GitHub connection with:"
         echo "  ssh -T git@github.com"
         exit 0
     fi
+
     echo "🔄 Recreating SSH key..."
 fi
 
 read -p "Enter your GitHub email: " EMAIL
+
 echo "Creating ssh key: $KEY"
 ssh-keygen -t ed25519 -C "$EMAIL" -f "$KEY" -N ""
 
@@ -89,15 +88,15 @@ eval "$(ssh-agent -s)"
 ssh-add "$KEY"
 
 echo ""
-echo "To save this key in Github:"
+echo "To save this key in GitHub:"
 echo ""
 echo "1. Go to https://github.com/settings/ssh/new"
-echo "2. Give it a name (suggested: $(build_ssh_name))"
-echo "3. Verify with ssh -T git@github.com"
+echo "2. Give it a name: $(build_ssh_name)"
+echo "3. Paste the public key below"
+echo "4. Verify with: ssh -T git@github.com"
 echo ""
 echo "--------------------------------"
 cat "$KEY.pub"
 echo "--------------------------------"
 
 read -r -p "Press Enter once the key is added to continue… " < /dev/tty
-

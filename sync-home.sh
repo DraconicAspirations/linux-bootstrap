@@ -1,15 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/lib/pkg.sh"
+source ./pkg.sh
 
 REPO_SSH="git@github.com:DraconicAspirations/linux-sync.git"
 SYNC_DIR="$HOME/linux-sync"
 
 pkg_install git rsync openssh
 
-# --- Clone or update repo ---
 if [[ -d "$SYNC_DIR/.git" ]]; then
   echo "Existing linux-sync repo found. Pulling latest…"
   git -C "$SYNC_DIR" pull
@@ -19,22 +17,17 @@ else
   git clone "$REPO_SSH" "$SYNC_DIR"
 fi
 
-# --- Sync files into home ---
 echo "Syncing files into home directory…"
 
-# Explanation:
-# -a  = archive mode (keeps permissions, copies dirs/files)
-# -v  = verbose
-# --delete = delete removed files (optional, remove if you don't want this)
-# --exclude = skip .git and sensitive directories
 rsync -av \
   --exclude=".ssh/" \
   "$SYNC_DIR/" "$HOME/" || {
     code=$?
-    # Exit code 24 = vanished source files (transient git lock files). Safe to ignore.
+
+    # Exit code 24 = vanished source files, usually transient git lock files.
     if [[ $code -ne 24 ]]; then
       echo "❌ rsync failed with exit code $code"
-      exit $code
+      exit "$code"
     fi
   }
 
