@@ -15,13 +15,11 @@ bash ./github-connect.sh
 
 echo ""
 echo "📥 Step 2: Sync dotfiles from linux-sync repo"
-echo "This may take a few minutes..."
-bash "$SCRIPT_DIR/sync-home.sh"
+bash ./sync-home.sh
 
 echo ""
 echo "📦 Step 3: Install packages and setup environment"
-echo "This may take a few minutes...
-bash "$SCRIPT_DIR/call-self-setup.sh"
+bash ./call-self-setup.sh
 
 echo ""
 echo "✅ Linux Bootstrap Complete"

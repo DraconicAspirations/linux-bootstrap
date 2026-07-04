@@ -90,19 +90,13 @@ ssh-add "$KEY"
 echo ""
 echo "To save this key in GitHub:"
 echo ""
-echo "1. Open Github"
-echo "https://github.com/settings/ssh/new"
+echo "1. Go to https://github.com/settings/ssh/new"
+echo "2. Give it a name: $(build_ssh_name)"
+echo "3. Paste the public key below"
+echo "4. Verify with: ssh -T git@github.com"
 echo ""
-echo "2. Give it the following name:"
-echo "$(build_ssh_name)"
-echo ""
-echo "3. Enter the following key:"
+echo "--------------------------------"
 cat "$KEY.pub"
+echo "--------------------------------"
 
-read -r -p "Press Enter once the key is added to verify… " < /dev/tty
-
-echo "Running verification... (ssh -T git@github.com)"
-ssh -T git@github.com
-
-read -r -p "Verification complete. Press enter to proceed. " < /dev/tty
-
+read -r -p "Press Enter once the key is added to continue… " < /dev/tty
