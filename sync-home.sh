@@ -3,7 +3,7 @@ set -euo pipefail
 
 source ./pkg.sh
 
-REPO_SSH="git@github.com:DraconicAspirations/linux-sync.git"
+REPO_SSH="git@github.com:DraconicAspirations/unix-sync.git"
 SYNC_DIR="$HOME/linux-sync"
 
 pkg_install git rsync openssh
