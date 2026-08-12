@@ -1,4 +1,4 @@
-# Linux Sync
+# Unix Bootstrap
 
 Run this to get started: 
 
