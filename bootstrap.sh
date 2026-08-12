@@ -24,6 +24,8 @@ if [[ ! -f "$SCRIPT_DIR/pkg.sh" ]]; then
     exec bash "$BOOTSTRAP_DIR/unix-bootstrap/bootstrap.sh"
 fi
 
+cd "$SCRIPT_DIR"
+
 LOGFILE="$HOME/.bootstrap.log"
 exec > >(tee -a "$LOGFILE") 2>&1
 
