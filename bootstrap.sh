@@ -4,9 +4,14 @@ set -euo pipefail
 REPO="https://github.com/DraconicAspirations/unix-bootstrap.git"
 
 # When bootstrap.sh is run directly from GitHub (for example via curl), the
-# rest of the repository is not present yet. Git is the one prerequisite we
-# require in order to fetch it.
+# rest of the repository is not present yet. Git is required to fetch it.
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+
+if ! command -v sudo >/dev/null 2>&1; then
+    echo "⚠️  sudo is required to bootstrap this system, but it is not installed."
+    echo "Please install sudo and run bootstrap.sh again."
+    exit 1
+fi
 
 if [[ ! -f "$SCRIPT_DIR/pkg.sh" ]]; then
     if ! command -v git >/dev/null 2>&1; then
