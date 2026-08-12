@@ -102,7 +102,16 @@ cat "$KEY.pub"
 read -r -p "Press Enter once the key is added to verify… " < /dev/tty
 
 echo "Running verification... (ssh -T git@github.com)"
-ssh -T git@github.com
+if ssh -T git@github.com; then
+    :
+else
+    status=$?
+    # GitHub returns exit status 1 after successful authentication because it
+    # deliberately does not provide shell access. Treat that as success.
+    if [[ $status -ne 1 ]]; then
+        echo "❌ GitHub SSH verification failed with exit status $status"
+        exit "$status"
+    fi
+fi
 
 read -r -p "Verification complete. Press enter to proceed. " < /dev/tty
-
